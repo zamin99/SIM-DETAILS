@@ -1,0 +1,327 @@
+
+<!doctype html>
+<html lang="en"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>ZAMIN Sim Details</title> 
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    #matrixCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .box {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 35px 25px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      text-align: center;
+    }
+
+    .box h2 {
+      font-size: 26px;
+      margin-bottom: 25px;
+      color: #ff416c;
+      background: -webkit-linear-gradient(left, #ff416c, #ff4b2b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .box input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .box button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #fff;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .box button:hover {
+      transform: scale(1.05);
+    }
+
+    .primary-btn {
+      background: linear-gradient(90deg, #ff416c, #ff4b2b);
+      box-shadow: 0 0 10px #ff416c;
+    }
+
+    .whatsapp-btn {
+      background: linear-gradient(90deg, #25D366, #128C7E);
+      box-shadow: 0 0 10px #25D366;
+    }
+
+    .telegram-btn {
+      background: linear-gradient(90deg, #0088cc, #005577);
+      box-shadow: 0 0 10px #0088cc;
+    }
+
+    .copy-btn {
+      background: linear-gradient(90deg, #666, #444);
+      box-shadow: 0 0 10px #777;
+    }
+
+    #responseBox {
+      display: none;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+      text-align: left;
+      white-space: pre-line;
+      font-size: 15px;
+      box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+      animation: fadeIn 1s ease-in-out;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    a {
+      color: #00bfff;
+      text-decoration: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #popupOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #popupOverlay div {
+      background: #1c1c1c;
+      padding: 30px 20px;
+      border-radius: 15px;
+      text-align: center;
+      max-width: 300px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.2);
+    }
+
+    #popupOverlay h3 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    #popupOverlay button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #popupOverlay .join-btn {
+      background: #0088cc;
+    }
+
+    #popupOverlay .cancel-btn {
+      background: #555;
+    }
+  </style> 
+</head> 
+<body> 
+  <canvas id="matrixCanvas"></canvas> 
+  <div class="box"> 
+    <h2>ZAMIN HACKER DB</h2> 
+    <input type="text" id="number" placeholder="Enter phone number or CNIC" required> 
+    <button class="primary-btn" onclick="fetchData()">🔎 Get Details</button> 
+    <div id="responseBox"></div> 
+    <button id="shareButton" class="whatsapp-btn" onclick="shareWhatsApp()" style="display: none;">📲 Share on WhatsApp</button> 
+    <button id="copyButton" class="copy-btn" onclick="copyToClipboard()" style="display: none;">📋 Copy Data</button> 
+    <button class="telegram-btn" onclick="window.open('https://t.me/PROFESSORXBOTMAKER', '_blank')">✈️ Join Telegram Channel</button> 
+  </div>
+
+  <!-- Popup Overlay -->
+  <div id="popupOverlay">
+    <div>
+      <h3>Join our Telegram Channel?</h3>
+      <button class="join-btn" onclick="joinTelegram()">Join Telegram</button>
+      <button class="cancel-btn" onclick="closePopup()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Matrix Background -->
+  <script>
+    const canvas = document.getElementById("matrixCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    const letters = "01";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array.from({length: columns}, () => 1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#00ff99";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 35);
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+
+  <!-- Main Script -->
+  <script>
+    async function fetchData() {
+      const number = document.getElementById("number").value.trim();
+      const responseBox = document.getElementById("responseBox");
+      const shareButton = document.getElementById("shareButton");
+      const copyButton = document.getElementById("copyButton");
+
+      if (!number) {
+        alert("Please enter a phone number or CNIC.");
+        return;
+      }
+
+      responseBox.innerHTML = "<p style='color: #FFD700; font-weight: bold;'>⌛ Fetching...</p>";
+      responseBox.style.display = "block";
+      shareButton.style.display = "none";
+      copyButton.style.display = "none";
+
+      const url = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://fam-official.serv00.net/sim/api.php?num=${number}`)}`;
+
+      try {
+        const res = await fetch(url);
+        const json = await res.json();
+        const apiData = JSON.parse(json.contents);
+
+        const isDefaultNotFound = (
+          apiData.status === "success" &&
+          Array.isArray(apiData.data) &&
+          apiData.data.length === 1 &&
+          apiData.data[0].Name === "❌ Data Not Found"
+        );
+
+        if (isDefaultNotFound) {
+          responseBox.innerHTML = `<p style="color: #FFD700; font-size: 16px; font-weight: bold;">
+            ❌ Oops! Data not found.<br><br>Need fresh SIM details? Contact the admin:<br>
+            <a href="https://t.me/PROXZAMIN" target="_blank">PROFESSORXZAMIN</a></p>`;
+          return;
+        }
+
+        if (apiData.status === "success" && Array.isArray(apiData.data) && apiData.data.length > 0) {
+          let content = "";
+          apiData.data.forEach((user, index) => {
+            content += `Result ${index + 1}:\n`;
+            content += `📞 Mobile: ${user.Mobile || "Not found"}\n`;
+            content += `👤 Name: ${user.Name || "Not found"}\n`;
+            content += `🆔 CNIC: ${user.CNIC || "Not found"}\n`;
+            content += `📍 Address: ${user.Address || "Not found"}\n`;
+            content += `📶 Operator: ${user.Operator || "Not found"}\n\n`;
+          });
+          responseBox.innerText = content.trim();
+          shareButton.style.display = "inline-block";
+          copyButton.style.display = "inline-block";
+        } else {
+          responseBox.innerHTML = `<p style="color: yellow; font-size: 16px; font-weight: bold;">Data Not Found</p>`;
+        }
+      } catch (e) {
+        responseBox.innerHTML = `<p style="color: red; font-size: 16px; font-weight: bold;">Error fetching data. Please try again later.</p>`;
+      }
+    }
+
+    function shareWhatsApp() {
+      const responseBox = document.getElementById("responseBox");
+      const text = encodeURIComponent(responseBox.innerText);
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+
+    function copyToClipboard() {
+      const responseText = document.getElementById("responseBox").innerText;
+      navigator.clipboard.writeText(responseText)
+        .then(() => alert("Copied to clipboard!"))
+        .catch(() => alert("Failed to copy data."));
+    }
+
+    function joinTelegram() {
+      window.open("https://t.me/PROFESSORXBOTMAKER", "_blank");
+      closePopup();
+    }
+
+    function closePopup() {
+      document.getElementById("popupOverlay").style.display = "none";
+    }
+
+    // Show popup after 100 seconds
+    setTimeout(() => {
+      document.getElementById("popupOverlay").style.display = "flex";
+    }, 10000);
+  </script> 
+</body>
+</html>
